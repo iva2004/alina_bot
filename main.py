@@ -11,12 +11,14 @@ from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 from aiogram.fsm.state import StatesGroup, State
 from database.models import User, Order, Category, SiteSetting, GlobalSetting, Promotion, StockItem, StockCategory
+from aiogram.filters import CommandStart
 
 # === 2. SQLALCHEMY (РАБОТА С БАЗОЙ) ===
 # Сгруппировали всё в один импорт, убрали дубликаты select и func
 from sqlalchemy import select, update, delete, func, text, Column, Integer, String, DateTime, Boolean, Float, ForeignKey, BigInteger, Text
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.orm import relationship
+from database.models import StockItem, StockCategory # Убедитесь, что это есть!
 
 # === 3. AIOGRAM (ЛОГИКА БОТА) ===
 from aiogram import Bot, Dispatcher, types, F
@@ -160,6 +162,11 @@ async def get_current_rate(key: str, default: float) -> float:
 
 
 # --- ОБРАБОТЧИКИ МЕНЮ ---
+@dp.message(CommandStart())
+async def command_start_handler(message: Message, state: FSMContext):
+    await state.clear() # Это "сбросит" все ожидания бота
+    # Ваш код приветствия...
+    await message.answer("Привет! Я обновился и готов к работе.")
 # --- ГЛАВНОЕ МЕНЮ И КАТЕГОРИИ ---
 @dp.message(CommandStart(), StateFilter("*"))
 async def cmd_start(message: Message, state: FSMContext):
